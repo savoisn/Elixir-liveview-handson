@@ -1,6 +1,6 @@
 defmodule SimpleMmoWeb.GameLive.LoginForm do
   use SimpleMmoWeb, :live_component
-  
+
   alias SimpleMmo.Game
 
   @impl true
@@ -42,15 +42,21 @@ defmodule SimpleMmoWeb.GameLive.LoginForm do
   @impl true
   def handle_event("validate", %{"player" => player_params}, socket) do
     changeset = Game.change_player(socket.assigns.player, player_params)
-    {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
+    form = to_form(changeset, action: :validate)
+    IO.inspect(form)
+    {:noreply, assign(socket, form: form)}
   end
-  
+
   def handle_event("save", %{"player" => player_params}, socket) do
     IO.inspect(player_params)
+
+    notify_parent({:saved, player_params})
     socket = assign(socket, :player, player_params)
     {:noreply,
      socket
      |> put_flash(:info, "Player created successfully")
      |> push_patch(to: socket.assigns.patch)}
   end
+
+  defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 end

@@ -3,7 +3,9 @@
   <div class="player">
     <%= if @player != %Player{} do %>
       <div>
-        Player is here
+        Player {@player.name} is here
+
+        <.button phx-click="attack">Attack</.button>
       </div>
     <% else %>
       Player is not here
@@ -19,5 +21,7 @@
       </.modal>
     <% end %>
   </div>
-  <div class="monster"></div>
+  <div class="monster">
+    
+  </div>
 </div>

@@ -1,11 +1,11 @@
 defmodule SimpleMmoWeb.GameLive.Index do
   use SimpleMmoWeb, :live_view
 
+  alias Phoenix.PubSub
+
   alias SimpleMmo.Game.Player
 
-
   @impl true
-  @spec mount(any(), any(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(_params, _session, socket) do
     socket = assign(socket, :player, %Player{})
     {:ok, stream(socket, :help, [])}
@@ -18,5 +18,37 @@ defmodule SimpleMmoWeb.GameLive.Index do
 
   def handle_info(_, _, socket) do
     {:noreply, stream(socket, :help, [])}
+  end
+
+  @impl true
+  def handle_event("attack", _value, socket) do
+    IO.inspect(socket.assigns)
+    topicname = socket.assigns.topicname
+    # player = socket.assigns.player
+    PubSub.broadcast_from(SimpleMmo.PubSub, self(), topicname, {:attack, %{damage: 10}})
+    {:noreply, socket}
+  end
+
+  def handle_info({:attack_dragon, attack}, socket) do
+    IO.inspect("Attack in done! for " <> to_string(attack.damage))
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({SimpleMmoWeb.GameLive.LoginForm, {:saved, player}}, socket) do
+    topic = "game"
+    socket =
+      socket
+      |> assign(:player, %Player{name: player["name"]})
+      |> assign(:topicname, topic)
+
+    PubSub.subscribe(SimpleMmo.PubSub, topic)
+    {:noreply, socket}
+  end
+
+  def handle_info(hello, socket) do
+    IO.inspect(hello)
+    IO.inspect("Attack in done!")
+    {:noreply, socket}
   end
 end
