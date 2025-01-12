@@ -1,0 +1,23 @@
+<div>
+  hello
+  <div class="player">
+    <%= if @player != %Player{} do %>
+      <div>
+        Player is here
+      </div>
+    <% else %>
+      Player is not here
+      <.modal id="player-modal" show on_cancel={JS.patch(~p"/game")}>
+        <.live_component
+          module={SimpleMmoWeb.GameLive.LoginForm}
+          id={:new}
+          title=""
+          action={@live_action}
+          player={@player}
+          patch={~p"/game"}
+          />
+      </.modal>
+    <% end %>
+  </div>
+  <div class="monster"></div>
+</div>
