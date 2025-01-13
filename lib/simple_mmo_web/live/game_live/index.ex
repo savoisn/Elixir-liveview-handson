@@ -4,10 +4,12 @@ defmodule SimpleMmoWeb.GameLive.Index do
   alias Phoenix.PubSub
 
   alias SimpleMmo.Game.Player
+  alias SimpleMmo.Worker.Enemy
 
   @impl true
   def mount(_params, _session, socket) do
     socket = assign(socket, :player, %Player{})
+            |> assign(:monster_health, Enemy.get_current_hp().hp)
     {:ok, stream(socket, :help, [])}
   end
 
@@ -34,15 +36,24 @@ defmodule SimpleMmoWeb.GameLive.Index do
     {:noreply, socket}
   end
 
+
   @impl true
   def handle_info({SimpleMmoWeb.GameLive.LoginForm, {:saved, player}}, socket) do
     topic = "game"
+
     socket =
       socket
       |> assign(:player, %Player{name: player["name"]})
       |> assign(:topicname, topic)
 
     PubSub.subscribe(SimpleMmo.PubSub, topic)
+    {:noreply, socket}
+  end
+
+  def handle_info({:dragon_health, %{hp: hp}}, socket) do
+    IO.inspect("dragon health! "<> to_string(hp))
+
+    socket = assign(socket, :monster_health, hp)
     {:noreply, socket}
   end
 

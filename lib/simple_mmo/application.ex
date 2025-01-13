@@ -16,6 +16,7 @@ defmodule SimpleMmo.Application do
       {Finch, name: SimpleMmo.Finch},
       # Start a worker by calling: SimpleMmo.Worker.start_link(arg)
       # {SimpleMmo.Worker, arg},
+      {SimpleMmo.Worker.Enemy, 20000},
       # Start to serve requests, typically the last entry
       SimpleMmoWeb.Endpoint
     ]
