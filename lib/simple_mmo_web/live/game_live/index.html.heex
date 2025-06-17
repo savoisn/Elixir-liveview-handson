@@ -3,9 +3,13 @@
   <div class="player">
     <%= if @player != %Player{} do %>
       <div>
-        Player {@player.name} is here
-
-        <.button phx-click="attack">Attack</.button>
+        Player Character {@player.name} is here <br/>
+        <%= if @player.hp > 0 do %>        
+          HP : {@player.hp} <br/>
+          <.button phx-click="attack">Attack</.button>
+        <% else %>
+          Player Character is dead... reload page to create a new Characher!
+        <% end %>
       </div>
     <% else %>
       Player is not here

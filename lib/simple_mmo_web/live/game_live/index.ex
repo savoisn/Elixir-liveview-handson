@@ -7,6 +7,7 @@ defmodule SimpleMmoWeb.GameLive.Index do
   alias SimpleMmo.Worker.Enemy
 
   @impl true
+  @spec mount(any(), any(), map()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(_params, _session, socket) do
     socket = assign(socket, :player, %Player{})
             |> assign(:monster_health, Enemy.get_current_hp().hp)
@@ -43,7 +44,7 @@ defmodule SimpleMmoWeb.GameLive.Index do
 
     socket =
       socket
-      |> assign(:player, %Player{name: player["name"]})
+      |> assign(:player, %Player{name: player["name"], hp: 200})
       |> assign(:topicname, topic)
 
     PubSub.subscribe(SimpleMmo.PubSub, topic)
@@ -56,6 +57,21 @@ defmodule SimpleMmoWeb.GameLive.Index do
     socket = assign(socket, :monster_health, hp)
     {:noreply, socket}
   end
+
+  def handle_info({:dragon_attack, %{damage: damage}}, socket) do
+    IO.inspect("dragon attacked! "<> to_string(damage))
+
+    player = socket.assigns.player
+
+    player = %{player | hp: player.hp - damage}
+    IO.inspect(player)
+
+    socket =
+      socket
+      |> assign(:player, player)
+    {:noreply, socket}
+  end
+
 
   def handle_info(hello, socket) do
     IO.inspect(hello)

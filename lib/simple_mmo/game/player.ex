@@ -8,6 +8,7 @@ Players schema.
 
   schema "players" do
     field :name, :string
+    field :hp, :integer
 
     timestamps(type: :utc_datetime)
   end
